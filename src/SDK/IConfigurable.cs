@@ -14,12 +14,10 @@
 	   limitations under the License.
 */
 using System;
-using System.IO;
 using System.Collections.Generic;
 
-namespace PageOfBob.NFountain.SDK
-{
-	public interface IOutputModule {
-		void Transform(IEnumerable<Element> elements, Stream output);
+namespace PageOfBob.NFountain {
+	public interface IConfigurable {
+		IEnumerable<ICommand> Commands { get; }
 	}
 }

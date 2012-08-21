@@ -14,10 +14,12 @@
 	   limitations under the License.
 */
 using System;
+using System.Collections.Generic;
 
-namespace PageOfBob.NFountain.SDK
-{
-	public class DialogElement : SimpleTextElement { 
-		public DialogElement(string value) : base(ElementType.Dialog, value) { } 
+namespace PageOfBob.NFountain {
+	public interface IEngine {
+		IParser Parser { get; }
+		IWriter Writer { get; }
+		void AddCommand(ICommand command);
 	}
 }

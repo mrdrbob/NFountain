@@ -15,11 +15,26 @@
 */
 using System;
 
-namespace PageOfBob.NFountain.SDK
+using PageOfBob.NFountain.Configuration;
+
+namespace PageOfBob.NFountain.Commands
 {
-	public class TitlePartElement : Element {
-		public TitlePartElement(string key, string value) : base(ElementType.TitlePart) { Key = key; Value = value; }
-		public string Key { get; private set; }
-		public string Value { get; private set; }
+	internal class PluginArgument : CommandArgument {
+		private Engine _engine;
+		private PluginType _type;
+		public NFountainPlugin Plugin { get; private set; }
+		
+		public PluginArgument(Engine engine, PluginType type) {
+			_engine = engine;
+			_type = type;
+		}
+		
+		public override bool TryParse(string rawArg) {
+			Plugin = _engine.LoadPlugin(rawArg, _type);
+			return Plugin != null;
+		}
+		
+		public override string Name { get { return "Plugin ID"; } }
 	}
+
 }

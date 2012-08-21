@@ -14,10 +14,12 @@
 	   limitations under the License.
 */
 using System;
+using System.IO;
+using System.Collections.Generic;
 
-namespace PageOfBob.NFountain.SDK
+namespace PageOfBob.NFountain
 {
-	public class CharacterElement : SimpleTextElement { 
-		public CharacterElement(string value) : base(ElementType.Character, value) { } 
+	public interface IWriter {
+		void Transform(IEnumerable<Element> elements, Stream output);
 	}
 }

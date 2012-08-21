@@ -15,7 +15,7 @@
 */
 using System;
 
-namespace PageOfBob.NFountain.SDK
+namespace PageOfBob.NFountain
 {
 	public class SynopsisElement : SimpleTextElement { 
 		public SynopsisElement(string value) : base(ElementType.Synopsis, value) { } 

@@ -15,7 +15,7 @@
 */
 using System;
 
-namespace PageOfBob.NFountain.SDK
+namespace PageOfBob.NFountain
 {
 	public class LineBreakElement : Element {
 		public LineBreakElement() : base(ElementType.LineBreak) { }

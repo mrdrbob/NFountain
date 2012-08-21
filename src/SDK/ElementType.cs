@@ -16,23 +16,19 @@
 
 using System;
 
-namespace PageOfBob.NFountain.SDK {
+namespace PageOfBob.NFountain {
 	public enum ElementType {
 		None = 0,
 		Heading,
-		Character,
-		Parenthetical,
-		Dialog,
 		DialogGroup,
 		Action,
 		Boneyard,
-		Transaction,
+		Transition,
 		CenteredText,
 		LineBreak,
 		NoteBlock,
 		Section,
 		Synopsis,
-		TitlePart,
 		Title
 	}
 }

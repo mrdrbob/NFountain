@@ -15,7 +15,7 @@
 */
 using System;
 
-namespace PageOfBob.NFountain.SDK
+namespace PageOfBob.NFountain
 {
 	public class SectionElement : SimpleTextElement {
 		public SectionElement(int depth, string name)

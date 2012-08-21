@@ -15,11 +15,10 @@
 */
 using System;
 using System.Collections.Generic;
+using System.IO;
 
-namespace PageOfBob.NFountain
-{
-	public class TitleElement : Element {
-		public TitleElement(KeyValuePair<string, string>[]  parts) : base(ElementType.Title) { Parts = parts; }
-		public KeyValuePair<string, string>[] Parts { get; private set; }
+namespace PageOfBob.NFountain {
+	public interface IParser {
+		IEnumerable<Element> Transform(TextReader str);
 	}
 }

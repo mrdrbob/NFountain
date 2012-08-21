@@ -15,7 +15,7 @@
 */
 using System;
 
-namespace PageOfBob.NFountain.SDK
+namespace PageOfBob.NFountain
 {
 	public class HeadingElement : SimpleTextElement { 
 		public HeadingElement(string value) : base(ElementType.Heading, value) { } 

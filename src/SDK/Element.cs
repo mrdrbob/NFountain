@@ -17,7 +17,7 @@
 
 using System;
 
-namespace PageOfBob.NFountain.SDK {
+namespace PageOfBob.NFountain {
 	public abstract class Element {
 		protected Element(ElementType type) { Type = type; }
 		public ElementType Type { get; private set; }

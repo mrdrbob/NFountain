@@ -14,18 +14,18 @@
 	   limitations under the License.
 */
 using System;
+using System.IO;
+
+using Sprache;
 
 namespace PageOfBob.NFountain
 {
 	class Program
 	{
-		public static void Main(string[] args)
-		{
-			
-			DefaultParser parser = new DefaultParser();
-			TextOutputTransformer output = new TextOutputTransformer();
-
-			output.Transform(parser.Transform(Console.OpenStandardInput()), Console.OpenStandardOutput());
+		public static int Main(string[] args) {
+			// System.Diagnostics.Debugger.Break();
+			Engine engine = new Engine();
+			return engine.Execute(args);
 		}
 	}
 }

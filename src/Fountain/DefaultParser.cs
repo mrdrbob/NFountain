@@ -20,11 +20,9 @@ using System.Linq;
 
 using Sprache;
 
-using PageOfBob.NFountain.SDK;
-
 namespace PageOfBob.NFountain
 {
-	public class DefaultParser : PageOfBob.NFountain.SDK.IInputModule {
+	public class DefaultParser {
 		
 		public DefaultParser() {
 			CreateParser();
@@ -42,6 +40,7 @@ namespace PageOfBob.NFountain
 		public Parser<char> UpperCase;
 		public Parser<string> UpperCaseLine;
 		public Parser<string> IndentedLine;
+		public Parser<string> TabsAndSpaces;
 		#endregion
 
 		#region Heading
@@ -52,18 +51,16 @@ namespace PageOfBob.NFountain
 		#endregion
 
 		#region Dialog
-		public Parser<CharacterElement> Character;
-		public Parser<ParentheticalElement> Parenthetical;
-		public Parser<DialogElement> Dialog;
-		// public Parser<DialogGroupElement> DialogGroupWithParen;
-		// public Parser<DialogGroupElement> DialogGroupWithoutParen;
+		public Parser<string> Character;
+		public Parser<string> Parenthetical;
+		public Parser<string> Dialog;
 		public Parser<DialogGroupElement> DialogGroup;
 		#endregion
 
-		#region Transaction
-		public Parser<TransactionElement> NaturalTransaction;
-		public Parser<TransactionElement> ForcedTransaction;
-		public Parser<TransactionElement> Transaction;
+		#region Transition
+		public Parser<TransitionElement> NaturalTransition;
+		public Parser<TransitionElement> ForcedTransition;
+		public Parser<TransitionElement> Transition;
 		#endregion
 
 		#region Centered Text
@@ -93,11 +90,23 @@ namespace PageOfBob.NFountain
 		#endregion
 
 		#region Title
-		public Parser<TitlePartElement> SimpleTitlePart;
-		public Parser<TitlePartElement> MultilineTitlePart;
+		public Parser<KeyValuePair<string,string>> SimpleTitlePart;
+		public Parser<KeyValuePair<string,string>> MultilineTitlePart;
 		public Parser<TitleElement> Title;
 		#endregion
 
+		#region ContentNode
+		public Parser<string> EscapedContentChar;
+		public Parser<string> NonEscapedContentChar;
+		public Parser<ContentNode> PlainText;
+		public Parser<ContentNode> Underline;
+		public Parser<ContentNode> BoldItalic;
+		public Parser<ContentNode> Bold;
+		public Parser<ContentNode> Italic;
+		public Parser<ContentNode> ContentNodePiece;
+		public Parser<ContentNode> ContentNodeBody;
+		#endregion
+		
 		private void CreateParser() {
 			#region Newlines / Text
 			WinNewline = from c in Parse.String("\r\n").Text()
@@ -125,9 +134,13 @@ namespace PageOfBob.NFountain
 			UpperCaseLine = from c in UpperCase.AtLeastOnce().Text()
 							from nl in Newline
 							select c;
+			TabsAndSpaces = 
+				from tabs in Parse.Char(x => x == '\t' || x == ' ', "tabs or spaces").Many().Text()
+				select tabs;
+			
 			IndentedLine =
 				from c in Parse.String("   ").Or(Parse.String("\t"))
-				from ws in Parse.Char(x => x == ' ' || x == '\t', "space or tab").Many()
+				from ws in TabsAndSpaces
 				from line in CompleteLine
 				select line;
 			#endregion
@@ -165,21 +178,21 @@ namespace PageOfBob.NFountain
 				select new BoneyardElement(content);
 			#endregion
 
-			#region Transaction
-			NaturalTransaction =
+			#region Transition
+			NaturalTransition =
 				from line in UpperCase.Except(Parse.String("TO:")).Many().Text()
 				from to in Parse.String("TO:").Text()
 				from nl in EmptyLine
-				select new TransactionElement(line);
+				select new TransitionElement(line + "TO:");
 
-			ForcedTransaction =
+			ForcedTransition =
 				from gt in Parse.Char('>')
 				from line in UntilEOL
 				from nl in EmptyLine
-				select new TransactionElement(line);
+				select new TransitionElement(line);
 
-			Transaction =
-				from trans in ForcedTransaction.Or(NaturalTransaction)
+			Transition =
+				from trans in ForcedTransition.Or(NaturalTransition)
 				select trans;
 			#endregion
 
@@ -194,33 +207,36 @@ namespace PageOfBob.NFountain
 
 			#region Dialog
 			Character = 
+				from ws in TabsAndSpaces
 				from c in UpperCaseLine
-				select new CharacterElement(c);
+				select c;
 
 			Parenthetical = 
+				from ws in TabsAndSpaces
 				from s in Parse.Char('(')
 				from m in Parse.Char(x => x != ')', "Not closing paren").AtLeastOnce().Text()
 				from e in Parse.Char(')')
 				from nl in Newline
-				select new ParentheticalElement("(" + m + ")" + nl);
+				select m;
 
 			Dialog =
-				from line in CompleteLine.Many()
+				from ws in TabsAndSpaces
+				from line in CompleteLine.AtLeastOnce()
 				from nl in Newline
-				select new DialogElement(string.Join(" ", line));
+				select string.Join(" ", line);
 
 			DialogGroup =
 				from character in Character
-				from paren in Parenthetical.Or(Parse.Return<ParentheticalElement>(null))
+				from paren in Parenthetical.Or(Parse.Return<string>(null))
 				from diag in Dialog
-				select new DialogGroupElement(character, paren, diag);
+				select new DialogGroupElement(character, paren, ContentNodeBody.Parse(diag));
 			#endregion
 
 			#region Action
 			Action =
 				from line in CompleteLine.Many()
 				from nl in Newline
-				select new ActionElement(string.Join(" ", line.ToArray()));
+				select new ActionElement( ContentNodeBody.Parse(string.Join(" ", line.ToArray())) );
 			#endregion
 
 			#region Linebreak / Noteblock / Section / Synopsis
@@ -234,6 +250,7 @@ namespace PageOfBob.NFountain
 				from content in Parse.AnyChar.Except(Parse.String("]]")).Many().Text()
 				from end in Parse.String("]]")
 				from nl in EmptyLine
+				from nls in Newline.Many()
 				select new NoteBlockElement(content);
 
 			Section =
@@ -241,13 +258,12 @@ namespace PageOfBob.NFountain
 				from ws in Parse.WhiteSpace.Many()
 				from line in UntilEOL
 				from nl in EmptyLine
-				select new SectionElement(start.Count(), line + nl);
+				select new SectionElement(start.Count(), line);
 
 			Synopsis =
 				from start in Parse.Char('=')
 				from ws in Parse.WhiteSpace.Many()
 				from content in CompleteLine.AtLeastOnce()
-				from nl in Newline
 				select new SynopsisElement(string.Join(" ", content.ToArray()));
 			#endregion
 
@@ -255,17 +271,17 @@ namespace PageOfBob.NFountain
 			SimpleTitlePart =
 				from key in Parse.Char(x => x != ':' && x != '\r' && x != '\n', "Not : or newline").AtLeastOnce().Text()
 				from colon in Parse.Char(':')
-				from ws in Parse.Char(x => x == ' ' || x == '\t', "space or tab").Many()
+				from ws in TabsAndSpaces
 				from value in CompleteLine
-				select new TitlePartElement(key, value);
+				select new KeyValuePair<string, string>(key, value);
 
 			MultilineTitlePart =
 				from key in Parse.Char(x => x != ':' && x != '\r' && x != '\n', "Not : or newline").AtLeastOnce().Text()
 				from colon in Parse.Char(':')
-				from ws in Parse.Char(x => x == ' ' || x == '\t', "Space or tab").Many()
+				from ws in TabsAndSpaces
 				from nl in Newline
 				from lines in IndentedLine.AtLeastOnce()
-				select new TitlePartElement(key, string.Join(nl, lines.ToArray()));
+				select new KeyValuePair<string, string>(key, string.Join(nl, lines.ToArray()));
 
 			Title =
 				from parts in SimpleTitlePart.Or(MultilineTitlePart).AtLeastOnce()
@@ -282,7 +298,7 @@ namespace PageOfBob.NFountain
 					.Or<Element>(Header)
 					.Or<Element>(Synopsis)
 					.Or<Element>(CenteredText)
-					.Or<Element>(Transaction)
+					.Or<Element>(Transition)
 					.Or<Element>(DialogGroup)
 					.Or<Element>(Action)
 				from ws in Newline.Many()
@@ -301,13 +317,53 @@ namespace PageOfBob.NFountain
 				from el in BodyWithTitle.Or(BodyWithoutTitle)
 				select el;
 			#endregion
-		}
-		
-		public IEnumerable<Element> Transform(Stream str) {
-			TextReader r = new StreamReader(str);
-			string fullText = r.ReadToEnd();
 			
-			return Elements.Parse(fullText);
+			#region ContentNode
+			EscapedContentChar = 
+				from slash in Parse.Char('\\')
+				from chr in Parse.Char(x => x == '\\' || x == '*' || x == '_', "slash, star, underscore")
+				select chr.ToString();
+			
+			NonEscapedContentChar = 
+				from txt in Parse.Char(x => x != '\\' && x != '*' && x != '_', "not slash, star, underscore").AtLeastOnce().Text()
+				select txt;
+			
+			PlainText = 
+				from vals in EscapedContentChar.Or(NonEscapedContentChar).AtLeastOnce()
+				select new ContentNode(ContentNodeType.Text, string.Join("", vals.ToArray()), null);
+			
+			Underline = 
+				from o in Parse.Char('_')
+				from body in BoldItalic.Or(Bold).Or(Italic).Or(PlainText).AtLeastOnce()
+				from c in Parse.Char('_')
+				select new ContentNode(ContentNodeType.Underline, null, body.ToArray());
+			
+			BoldItalic = 
+				from o in Parse.String("***")
+				from body in Bold.Or(Italic).Or(Underline).Or(PlainText).AtLeastOnce()
+				from c in Parse.String("***")
+				select new ContentNode(ContentNodeType.BoldItalic, null, body.ToArray());
+			
+			Bold = 
+				from o in Parse.String("**")
+				from body in BoldItalic.Or(Italic).Or(Underline).Or(PlainText).AtLeastOnce()
+				from c in Parse.String("**")
+				select new ContentNode(ContentNodeType.Bold, null, body.ToArray());
+			
+			Italic = 
+				from o in Parse.String("*")
+				from body in BoldItalic.Or(Bold).Or(Underline).Or(PlainText).AtLeastOnce()
+				from c in Parse.String("*")
+				select new ContentNode(ContentNodeType.Italic, null, body.ToArray());
+			
+			ContentNodePiece =
+				from val in BoldItalic.Or(Bold).Or(Italic).Or(Underline).Or(PlainText)
+				select val;
+			
+			ContentNodeBody = 
+				from body in ContentNodePiece.Many()
+				select new ContentNode(ContentNodeType.Container, null, body.ToArray());
+			#endregion
 		}
 	}
 }

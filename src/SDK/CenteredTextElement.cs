@@ -15,7 +15,7 @@
 */
 using System;
 
-namespace PageOfBob.NFountain.SDK
+namespace PageOfBob.NFountain
 {
 	public class CenteredTextElement : SimpleTextElement { 
 		public CenteredTextElement(string value) : base(ElementType.CenteredText, value) { } 

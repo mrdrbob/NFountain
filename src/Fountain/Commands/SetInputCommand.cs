@@ -14,10 +14,23 @@
 	   limitations under the License.
 */
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
-namespace PageOfBob.NFountain.SDK
-{
-	public class ParentheticalElement : SimpleTextElement { 
-		public ParentheticalElement(string value) : base(ElementType.Parenthetical, value) { } 
+namespace PageOfBob.NFountain.Commands {
+	internal class SetInputCommand : ICommand {
+		public string Trigger { get { return "input"; } }
+		public string Description { get { return "Sets the input source"; } }
+		private FilePathArgument _arg = new FilePathArgument();
+		
+		public IEnumerable<CommandArgument> Arguments { get { return new FilePathArgument[] { _arg }; } }
+		
+		public void Init(IEngine engine) { }
+		
+		public void Execute(IEngine engine) {
+			Engine eng = (Engine)engine;
+			eng.Input = new StreamReader(_arg.Path);
+		}
 	}
 }

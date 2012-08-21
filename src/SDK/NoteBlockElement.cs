@@ -15,7 +15,7 @@
 */
 using System;
 
-namespace PageOfBob.NFountain.SDK
+namespace PageOfBob.NFountain
 {
 	public class NoteBlockElement : SimpleTextElement { 
 		public NoteBlockElement(string value) : base(ElementType.NoteBlock, value) { } 

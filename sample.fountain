@@ -1,0 +1,50 @@
+Title: This is my title
+Date: 5/5/2012
+Multiline:
+   Multiline things are indented
+    And have multiple things
+	tab indented
+	 tab with a space
+
+INT. HEADER TEST
+
+EXT - THIS IS ALSO A HEADER - DAY
+
+.DAY - A forced header
+
+    BOB
+ Bob says some stuff
+
+BOB
+(Has parenthetical)
+Bob says stuff with parenthetical, this one is kind of longer
+and also breaks between two lines.  We'll see how the system
+handles this _bad *boy*_.  It also has ***formating!***
+
+INT - This is not
+because of this line.
+
+TRANSACTION CUTS TO:
+
+This is a line of action because it doesn't match anything else.
+It also breaks to two lines.
+
+>This is a forced transaction:
+
+>But this is centered text<
+
+===
+
+To more action!
+
+# Section Header
+
+## Double header
+
+[[This is a note
+block section]]
+
+= This is a single line synposis
+
+= This is a double line synopsis
+that goes through two lines.

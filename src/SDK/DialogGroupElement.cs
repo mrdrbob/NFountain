@@ -15,16 +15,16 @@
 */
 using System;
 
-namespace PageOfBob.NFountain.SDK
+namespace PageOfBob.NFountain
 {
 	public class DialogGroupElement : Element {
-		public DialogGroupElement(CharacterElement character, ParentheticalElement parenthetical, DialogElement dialog) : base(ElementType.DialogGroup) {
+		public DialogGroupElement(string character, string parenthetical, ContentNode dialog) : base(ElementType.DialogGroup) {
 			Character = character;
 			Parenthetical = parenthetical;
 			Dialog = dialog;
 		}
-		public CharacterElement Character { get; private set; }
-		public ParentheticalElement Parenthetical { get; private set; }
-		public DialogElement Dialog { get; private set; }
+		public string Character { get; private set; }
+		public string Parenthetical { get; private set; }
+		public ContentNode Dialog { get; private set; }
 	}
 }

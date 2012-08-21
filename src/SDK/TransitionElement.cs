@@ -14,12 +14,10 @@
 	   limitations under the License.
 */
 using System;
-using System.Collections.Generic;
-using System.IO;
 
-namespace PageOfBob.NFountain.SDK
+namespace PageOfBob.NFountain
 {
-	public interface IInputModule {
-		IEnumerable<Element> Transform(Stream str);
+	public class TransitionElement : SimpleTextElement { 
+		public TransitionElement(string value) : base(ElementType.Transition, value) { } 
 	}
 }

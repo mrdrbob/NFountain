@@ -15,7 +15,7 @@
 */
 using System;
 
-namespace PageOfBob.NFountain.SDK
+namespace PageOfBob.NFountain
 {
 	public class BoneyardElement : SimpleTextElement { 
 		public BoneyardElement(string value) : base(ElementType.Boneyard, value) { } 

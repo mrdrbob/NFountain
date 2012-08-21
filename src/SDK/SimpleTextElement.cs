@@ -15,7 +15,7 @@
 */
 using System;
 
-namespace PageOfBob.NFountain.SDK
+namespace PageOfBob.NFountain
 {
 	public abstract class SimpleTextElement : Element {
 		protected SimpleTextElement(ElementType type, string value) : base(type) { Value = value; }

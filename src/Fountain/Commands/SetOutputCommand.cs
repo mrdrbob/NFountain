@@ -15,11 +15,22 @@
 */
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
-namespace PageOfBob.NFountain
-{
-	public class TitleElement : Element {
-		public TitleElement(KeyValuePair<string, string>[]  parts) : base(ElementType.Title) { Parts = parts; }
-		public KeyValuePair<string, string>[] Parts { get; private set; }
+namespace PageOfBob.NFountain.Commands {
+	internal class SetOutputCommand : ICommand {
+		public string Trigger { get { return "output"; } }
+		public string Description { get { return "Sets the output"; } }
+		private FilePathArgument _arg = new FilePathArgument();
+		
+		public IEnumerable<CommandArgument> Arguments { get { return new FilePathArgument[] { _arg }; } }
+		
+		public void Init(IEngine engine) { }
+		
+		public void Execute(IEngine engine) {
+			Engine eng = (Engine)engine;
+			eng.Output = File.OpenWrite(_arg.Path);
+		}
 	}
 }

@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <OutputType>Library</OutputType>
-    <RootNamespace>PageOfBob.NFountain.SDK</RootNamespace>
+    <RootNamespace>PageOfBob.NFountain</RootNamespace>
     <AssemblyName>PageOfBob.NFountain.SDK</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
@@ -32,6 +32,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -44,24 +45,26 @@
     <Compile Include="ActionElement.cs" />
     <Compile Include="BoneyardElement.cs" />
     <Compile Include="CenteredTextElement.cs" />
-    <Compile Include="CharacterElement.cs" />
-    <Compile Include="DialogElement.cs" />
+    <Compile Include="ContentNode.cs" />
     <Compile Include="DialogGroupElement.cs" />
     <Compile Include="Element.cs" />
     <Compile Include="ElementType.cs" />
+    <Compile Include="FormattedTextElement.cs" />
     <Compile Include="HeadingElement.cs" />
-    <Compile Include="IInputModule.cs" />
-    <Compile Include="IOutputModule.cs" />
+    <Compile Include="ICommand.cs" />
+    <Compile Include="ICommandArgument.cs" />
+    <Compile Include="IConfigurable.cs" />
+    <Compile Include="IEngine.cs" />
+    <Compile Include="IParser.cs" />
+    <Compile Include="IWriter.cs" />
     <Compile Include="LineBreakElement.cs" />
     <Compile Include="NoteBlockElement.cs" />
-    <Compile Include="ParentheticalElement.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SectionElement.cs" />
     <Compile Include="SimpleTextElement.cs" />
     <Compile Include="SynopsisElement.cs" />
     <Compile Include="TitleElement.cs" />
-    <Compile Include="TitlePartElement.cs" />
-    <Compile Include="TransactionElement.cs" />
+    <Compile Include="TransitionElement.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.Targets" />
 </Project>

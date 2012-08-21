@@ -14,10 +14,17 @@
 	   limitations under the License.
 */
 using System;
+using System.Configuration;
 
-namespace PageOfBob.NFountain.SDK
-{
-	public class TransactionElement : SimpleTextElement { 
-		public TransactionElement(string value) : base(ElementType.Transaction, value) { } 
+
+namespace PageOfBob.NFountain.Configuration {
+	public class NFountainPluginCollection : ConfigurationElementCollection {
+		protected override ConfigurationElement CreateNewElement() {
+			return new NFountainPlugin();
+		}
+		
+		protected override object GetElementKey(ConfigurationElement element) {
+			return ((NFountainPlugin)element).Key;
+		}
 	}
 }

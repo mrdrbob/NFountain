@@ -15,9 +15,9 @@
 */
 using System;
 
-namespace PageOfBob.NFountain.SDK
+namespace PageOfBob.NFountain
 {
-	public class ActionElement : SimpleTextElement { 
-		public ActionElement(string value) : base(ElementType.Action, value) { } 
+	public class ActionElement : FormattedTextElement { 
+		public ActionElement(ContentNode value) : base(ElementType.Action, value) { } 
 	}
 }

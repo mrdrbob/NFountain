@@ -14,12 +14,20 @@
 	   limitations under the License.
 */
 using System;
-using System.Collections.Generic;
+using System.IO;
 
-namespace PageOfBob.NFountain
+namespace PageOfBob.NFountain.Commands
 {
-	public class TitleElement : Element {
-		public TitleElement(KeyValuePair<string, string>[]  parts) : base(ElementType.Title) { Parts = parts; }
-		public KeyValuePair<string, string>[] Parts { get; private set; }
+	internal class FilePathArgument : CommandArgument {
+		public string Path { get; private set; }
+		
+		public override bool TryParse(string rawArg) {
+			if (!File.Exists(rawArg))
+				return false;
+			Path = rawArg;
+			return true;
+		}
+		
+		public override string Name { get { return "File path"; } }
 	}
 }
