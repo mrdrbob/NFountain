@@ -58,7 +58,9 @@ namespace PageOfBob.NFountain
 		#endregion
 
 		#region Transition
-		public Parser<TransitionElement> NaturalTransition;
+		public Parser<TransitionElement> ToTransition;
+		public Parser<TransitionElement> InTransition;
+		public Parser<TransitionElement> OutTransition;
 		public Parser<TransitionElement> ForcedTransition;
 		public Parser<TransitionElement> Transition;
 		#endregion
@@ -161,9 +163,10 @@ namespace PageOfBob.NFountain
 						   select new HeadingElement(c + rest);
 
 			ForcedHeader = from c in Parse.Char('.')
+						   from notdot in Parse.AnyChar.Except(Parse.Char('.'))
 						   from rest in UntilEOL
 						   from nl in EmptyLine
-						   select new HeadingElement(rest);
+						   select new HeadingElement(notdot.ToString() + rest);
 
 			Header = from header in SimpleHeader
 					 .Or(ForcedHeader)
@@ -179,11 +182,23 @@ namespace PageOfBob.NFountain
 			#endregion
 
 			#region Transition
-			NaturalTransition =
+			ToTransition =
 				from line in UpperCase.Except(Parse.String("TO:")).Many().Text()
 				from to in Parse.String("TO:").Text()
 				from nl in EmptyLine
 				select new TransitionElement(line + "TO:");
+			
+			InTransition =
+				from line in UpperCase.Except(Parse.String("IN:")).Many().Text()
+				from to in Parse.String("IN:").Text()
+				from nl in EmptyLine
+				select new TransitionElement(line + "IN:");
+			
+			OutTransition =
+				from line in UpperCase.Except(Parse.String("OUT:")).Many().Text()
+				from to in Parse.String("OUT:").Text()
+				from nl in EmptyLine
+				select new TransitionElement(line + "OUT:");
 
 			ForcedTransition =
 				from gt in Parse.Char('>')
@@ -192,7 +207,10 @@ namespace PageOfBob.NFountain
 				select new TransitionElement(line);
 
 			Transition =
-				from trans in ForcedTransition.Or(NaturalTransition)
+				from trans in ForcedTransition
+					.Or(ToTransition)
+					.Or(InTransition)
+					.Or(OutTransition)
 				select trans;
 			#endregion
 
