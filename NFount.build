@@ -1,0 +1,130 @@
+<project>
+	<property name="src.dir" value="src" />
+	<property name="bin.dir" value="bin" />
+	<property name="lib.dir" value="lib" />
+	<property name="release.dir" value="../nfountain-release" />
+	<property name="debug" value="true" overwrite="false" />
+	<property name="build.version" value="1.0.0.0" overwrite="false" />
+	<tstamp property="build.date" pattern="yyyy-MM-dd" verbose="true" />
+	<property name="nant.settings.currentframework" value="net-4.0" />
+
+	<target name="debug">
+		<property name="debug" value="true" />
+		<call target="build.all" />
+	</target>
+
+	<target name="release">
+		<property name="debug" value="false" />
+		<call target="build.all" />
+	</target>
+	
+	<target name="build.all">
+		<call target="build.console" />
+		<call target="build.pdf" />
+	</target>
+	
+	<target name="clean">
+		<delete dir="${bin.dir}" failonerror="false" />
+		<delete dir="${release.dir}" failonerror="false" />
+	</target>
+	
+	<target name="mkdirs">
+		<mkdir dir="${bin.dir}" />
+		<copy todir="${bin.dir}">
+			<fileset basedir="${lib.dir}/Sprache">
+				<include name="*.dll" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="build.sdk" depends="mkdirs">
+		<csc target="library" output="${bin.dir}/PageOfBob.NFountain.SDK.dll" debug="${debug}">
+			<sources basedir="${src.dir}/SDK">
+				<include name="**.cs" />
+			</sources>
+		</csc>
+	</target>
+
+	<target name="build.html" depends="build.sdk">
+		<csc target="library" output="${bin.dir}/PageOfBob.NFountain.HtmlWriter.dll" debug="${debug}">
+			<sources basedir="${src.dir}/HtmlWriter">
+				<include name="**.cs" />
+			</sources>
+			<references>
+				<include name="${bin.dir}/PageOfBob.NFountain.SDK.dll" />
+			</references>
+		</csc>
+	</target>
+	
+	<target name="build.pdf" depends="build.console">
+		<csc target="library" output="${bin.dir}/PageOfBob.NFountain.PDF.dll" debug="${debug}">
+			<sources basedir="${src.dir}/PDF">
+				<include name="**.cs" />
+			</sources>
+			<references>
+				<include name="${bin.dir}/PageOfBob.NFountain.SDK.dll" />
+				<include name="${bin.dir}/NFountain.exe" />
+			</references>
+		</csc>
+	</target>
+	
+	<target name="build.console" depends="build.sdk,build.html">
+		<csc target="exe" output="${bin.dir}/NFountain.exe" debug="${debug}">
+			<sources basedir="${src.dir}/Fountain">
+				<include name="**.cs" />
+			</sources>
+			<references>
+				<include name="${bin.dir}/PageOfBob.NFountain.SDK.dll" />
+				<include name="${bin.dir}/Sprache.dll" />
+			</references>
+		</csc>
+	</target>
+	
+	<target name="publish">
+		<call target="zip-bin" />
+		<call target="zip-src" />
+	</target>
+
+	<target name="zip-bin" depends="release">
+		<property name="bin.release.name" value="NFountain-${build.version}-bin" />
+		<property name="bin.release.dir" value="${release.dir}/${bin.release.name}" />
+		<mkdir dir="${release.dir}" />
+		<mkdir dir="${bin.release.dir}" />
+		<copy todir="${bin.release.dir}">
+			<fileset basedir="${bin.dir}">
+				<include name="**/*" />
+			</fileset>
+		</copy>
+		<copy file="README.txt" tofile="${bin.release.dir}/README.txt" />
+		<copy file="LICENSE.txt" tofile="${bin.release.dir}/LICENSE.txt" />
+		<zip zipfile="${release.dir}/${bin.release.name}.zip">
+			<fileset basedir="${bin.release.dir}">
+				<include name="**/*" />
+			</fileset>
+		</zip>
+	</target>
+
+	<target name="zip-src">
+		<property name="src.release.name" value="NFountain-${build.version}-src" />
+		<property name="src.release.dir" value="${release.dir}/${src.release.name}" />
+		<mkdir dir="${release.dir}" />
+		<delete dir="${src.release.dir}" failonerror="false" />
+		
+		<!--
+		<svn command="export" uri="${subversion.url}"
+			destination="${src.release.dir}" />
+		-->
+		
+		<exec program="svn">
+			<arg value="export" />
+			<arg path=".\" />
+			<arg path="${src.release.dir}" />
+		</exec>
+		
+		<zip zipfile="${release.dir}/${src.release.name}.zip">
+			<fileset basedir="${src.release.dir}">
+				<include name="**/*" />
+			</fileset>
+		</zip>
+	</target>
+</project>
