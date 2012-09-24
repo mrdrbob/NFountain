@@ -14,31 +14,9 @@
 	   limitations under the License.
 */
 using System;
-using System.IO;
 
-namespace PageOfBob.NFountain.Commands
-{
-	internal class FilePathArgument : CommandArgument {
-		public string Path { get; private set; }
-		
-		public override bool TryParse(string rawArg) {
-			if (!File.Exists(rawArg))
-				return false;
-			Path = rawArg;
-			return true;
-		}
-		
-		public override string Name { get { return "File path"; } }
-	}
-	
-	internal class NewFilePathArgument : CommandArgument {
-		public string Path { get; private set; }
-		
-		public override bool TryParse(string rawArg) {
-			Path = rawArg;
-			return true;
-		}
-		
-		public override string Name { get { return "File path"; } }
+namespace PageOfBob.NFountain.PDF {
+	internal abstract class BaseObject {
+		internal int Offset { get; set; }
 	}
 }

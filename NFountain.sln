@@ -1,12 +1,14 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-# SharpDevelop 4.1.0.8000
+# SharpDevelop 4.2.1.8805
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SDK", "src\SDK\SDK.csproj", "{2F4401CF-9BF3-4D66-B669-7D6D09C59BA4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fountain", "src\Fountain\Fountain.csproj", "{9873863E-FCC3-4806-9799-603AF49D537E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HtmlWriter", "src\HtmlWriter\HtmlWriter.csproj", "{CB156433-3917-4963-8C6C-7A0624B134F5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PDF", "src\PDF\PDF.csproj", "{EE2669E4-BA58-477F-90AC-C0E891FD0036}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,5 +28,9 @@ Global
 		{CB156433-3917-4963-8C6C-7A0624B134F5}.Debug|x86.ActiveCfg = Debug|x86
 		{CB156433-3917-4963-8C6C-7A0624B134F5}.Release|x86.Build.0 = Release|x86
 		{CB156433-3917-4963-8C6C-7A0624B134F5}.Release|x86.ActiveCfg = Release|x86
+		{EE2669E4-BA58-477F-90AC-C0E891FD0036}.Debug|x86.Build.0 = Debug|x86
+		{EE2669E4-BA58-477F-90AC-C0E891FD0036}.Debug|x86.ActiveCfg = Debug|x86
+		{EE2669E4-BA58-477F-90AC-C0E891FD0036}.Release|x86.Build.0 = Release|x86
+		{EE2669E4-BA58-477F-90AC-C0E891FD0036}.Release|x86.ActiveCfg = Release|x86
 	EndGlobalSection
 EndGlobal

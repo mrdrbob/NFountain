@@ -17,7 +17,7 @@ using System;
 
 namespace PageOfBob.NFountain
 {
-	public class CenteredTextElement : SimpleTextElement { 
-		public CenteredTextElement(string value) : base(ElementType.CenteredText, value) { } 
+	public class CenteredTextElement : FormattedTextElement { 
+		public CenteredTextElement(ContentNode value) : base(ElementType.CenteredText, value) { } 
 	}
 }

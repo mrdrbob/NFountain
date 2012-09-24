@@ -202,7 +202,7 @@ namespace PageOfBob.NFountain
 				from content in Parse.Char(x => x != '<', "Not LT").Except(Newline).Many().Text()
 				from c in Parse.Char('<')
 				from nl in EmptyLine
-				select new CenteredTextElement(content.Trim() + nl);
+				select new CenteredTextElement(ContentNodeBody.Parse(content.Trim()));
 			#endregion
 
 			#region Dialog

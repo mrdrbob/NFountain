@@ -22,15 +22,15 @@ namespace PageOfBob.NFountain.Commands {
 	internal class SetOutputCommand : ICommand {
 		public string Trigger { get { return "output"; } }
 		public string Description { get { return "Sets the output"; } }
-		private FilePathArgument _arg = new FilePathArgument();
+		private NewFilePathArgument _arg = new NewFilePathArgument();
 		
-		public IEnumerable<CommandArgument> Arguments { get { return new FilePathArgument[] { _arg }; } }
+		public IEnumerable<CommandArgument> Arguments { get { return new NewFilePathArgument[] { _arg }; } }
 		
 		public void Init(IEngine engine) { }
 		
 		public void Execute(IEngine engine) {
 			Engine eng = (Engine)engine;
-			eng.Output = File.OpenWrite(_arg.Path);
+			eng.Output = File.Create(_arg.Path);
 		}
 	}
 }

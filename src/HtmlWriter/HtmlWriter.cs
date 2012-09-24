@@ -159,7 +159,7 @@ namespace PageOfBob.NFountain.Plugins {
 						break;
 					case ElementType.CenteredText:
 						w.Write("<div class\"centered\">");
-						w.Write(HtmlEncode(((CenteredTextElement)item).Value));
+						w.Write(HtmlEncode(((CenteredTextElement)item).Content));
 						w.WriteLine("</div>");
 						break;
 					case ElementType.LineBreak:

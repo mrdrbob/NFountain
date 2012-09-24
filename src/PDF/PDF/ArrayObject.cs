@@ -13,32 +13,28 @@
 	   See the License for the specific language governing permissions and
 	   limitations under the License.
 */
-using System;
-using System.IO;
 
-namespace PageOfBob.NFountain.Commands
-{
-	internal class FilePathArgument : CommandArgument {
-		public string Path { get; private set; }
-		
-		public override bool TryParse(string rawArg) {
-			if (!File.Exists(rawArg))
-				return false;
-			Path = rawArg;
-			return true;
+using System;
+using System.Collections.Generic;
+
+namespace PageOfBob.NFountain.PDF {
+	internal class ArrayObject : BaseObject {
+		private readonly List<BaseObject> _objects;
+
+		public ArrayObject() {
+			_objects = new List<BaseObject>();
 		}
-		
-		public override string Name { get { return "File path"; } }
-	}
-	
-	internal class NewFilePathArgument : CommandArgument {
-		public string Path { get; private set; }
-		
-		public override bool TryParse(string rawArg) {
-			Path = rawArg;
-			return true;
+
+		public  ArrayObject(IEnumerable<BaseObject> values) { _objects = new List<BaseObject>(values); }
+
+		public IList<BaseObject> Objects { get { return _objects; } }
+
+		public ArrayObject Add(BaseObject obj) {
+			if (obj is IndirectObject)
+				obj = new IndirectReferenceObject(((IndirectObject)obj).Reference);
+
+			_objects.Add(obj);
+			return this;
 		}
-		
-		public override string Name { get { return "File path"; } }
 	}
 }

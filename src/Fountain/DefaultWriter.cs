@@ -115,7 +115,7 @@ namespace PageOfBob.NFountain {
 						writer.WriteLine();
 						break;
 					case ElementType.CenteredText:
-						WriteCentered(writer, ((CenteredTextElement)element).Value, Columns);
+						WriteCentered(writer, ((CenteredTextElement)element).Content.ToString(), Columns);
 						writer.WriteLine();
 						break;
 					case ElementType.LineBreak:

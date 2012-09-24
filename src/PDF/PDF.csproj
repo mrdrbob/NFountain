@@ -1,17 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
   <PropertyGroup>
-    <ProjectGuid>{9873863E-FCC3-4806-9799-603AF49D537E}</ProjectGuid>
+    <ProjectGuid>{EE2669E4-BA58-477F-90AC-C0E891FD0036}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <OutputType>Exe</OutputType>
+    <OutputType>Library</OutputType>
     <RootNamespace>PageOfBob.NFountain</RootNamespace>
-    <AssemblyName>Fountain</AssemblyName>
+    <AssemblyName>PageOfBob.NFountain.PDF</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <StartArguments>-input ..\..\..\..\sample.fountain -writer pdf-writer -output ..\..\..\..\output.pdf -boneyard -notes -sections</StartArguments>
-    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
     <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
     <NoStdLib>False</NoStdLib>
     <WarningLevel>4</WarningLevel>
@@ -25,13 +23,12 @@
     <FileAlignment>4096</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\Fountain\bin\Debug\</OutputPath>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>Full</DebugType>
     <Optimize>False</Optimize>
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <StartAction>Project</StartAction>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <OutputPath>bin\Release\</OutputPath>
@@ -42,16 +39,8 @@
     <DefineConstants>TRACE</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Sprache">
-      <HintPath>..\..\lib\Sprache\Sprache.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Configuration" />
     <Reference Include="System.Core">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Data" />
-    <Reference Include="System.Data.DataSetExtensions">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Xml" />
@@ -60,38 +49,47 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Commands\FilePathArgument.cs" />
-    <Compile Include="Commands\PluginArgument.cs" />
-    <Compile Include="Commands\SetInputCommand.cs" />
-    <Compile Include="Commands\SetOutputCommand.cs" />
-    <Compile Include="Commands\SetWriterCommand.cs" />
-    <Compile Include="Configuration\NFountainConfigurationSection.cs" />
-    <Compile Include="Configuration\NFountainPlugin.cs" />
-    <Compile Include="Configuration\NFountainPluginCollection.cs" />
-    <Compile Include="Configuration\PluginType.cs" />
-    <Compile Include="DefaultParser.cs" />
-    <Compile Include="DefaultWriter.cs" />
-    <Compile Include="Engine.cs" />
-    <Compile Include="ParseExtensions.cs" />
-    <Compile Include="Plugins\DefaultParserModule.cs" />
-    <Compile Include="Plugins\DefaultWriterModule.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="PageSettings.cs" />
+    <Compile Include="PdfWriter.cs" />
+    <Compile Include="PdfWriterModule.cs" />
+    <Compile Include="PDF\ArrayObject.cs" />
+    <Compile Include="PDF\BaseObject.cs" />
+    <Compile Include="PDF\Compositor.cs" />
+    <Compile Include="PDF\DictionaryObject.cs" />
+    <Compile Include="PDF\FontIdentifier.cs" />
+    <Compile Include="PDF\IndirectObject.cs" />
+    <Compile Include="PDF\IndirectReferenceObject.cs" />
+    <Compile Include="PDF\IntegerNumberObject.cs" />
+    <Compile Include="PDF\ListStream.cs" />
+    <Compile Include="PDF\NameObject.cs" />
+    <Compile Include="PDF\NextLine.cs" />
+    <Compile Include="PDF\NextlineWithOffset.cs" />
+    <Compile Include="PDF\PdfOutput.cs" />
+    <Compile Include="PDF\PrintString.cs" />
+    <Compile Include="PDF\RealNumberObject.cs" />
+    <Compile Include="PDF\Reference.cs" />
+    <Compile Include="PDF\SetFontCommand.cs" />
+    <Compile Include="PDF\SetTextMatrix.cs" />
+    <Compile Include="PDF\SimpleBaseObject.cs" />
+    <Compile Include="PDF\StreamObject.cs" />
+    <Compile Include="PDF\StringObject.cs" />
+    <Compile Include="PDF\TextCommand.cs" />
+    <Compile Include="PDF\TextCommandStream.cs" />
+    <Compile Include="PDF\TextWriterWrapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StringTokenizer.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="PDF" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Fountain\Fountain.csproj">
+      <Project>{9873863E-FCC3-4806-9799-603AF49D537E}</Project>
+      <Name>Fountain</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SDK\SDK.csproj">
       <Project>{2F4401CF-9BF3-4D66-B669-7D6D09C59BA4}</Project>
       <Name>SDK</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Configuration" />
-    <Folder Include="Commands" />
-    <Folder Include="Plugins" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.Targets" />
 </Project>
