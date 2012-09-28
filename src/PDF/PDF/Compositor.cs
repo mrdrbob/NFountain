@@ -37,8 +37,7 @@ namespace PageOfBob.NFountain.PDF {
 
 			_catalogReference = IndirectObject(_catalog = Dictionary("Catalog"));
 			_rootCollection = new PageCollectionBuilder(this);
-			_catalog.Set("Pages", _rootCollection.Reference)
-				.Set("PageMode", new NameObject("UserOutlines"));
+			_catalog.Set("Pages", _rootCollection.Reference);
 
 			FontID = 1;
 		}
@@ -235,7 +234,7 @@ namespace PageOfBob.NFountain.PDF {
 
 				IndirectObject reference = _parent.Compositor.IndirectObject(
 					_parent.Compositor.Dictionary("Font")
-						.Set("SubType", new NameObject("Type1"))
+						.Set("Subtype", new NameObject("Type1"))
 						.Set("BaseFont", new NameObject(baseFont))
 				);
 
