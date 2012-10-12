@@ -65,6 +65,9 @@
     <Compile Include="SynopsisElement.cs" />
     <Compile Include="TitleElement.cs" />
     <Compile Include="TransitionElement.cs" />
+    <Compile Include="WordAndFont.cs">
+      <DependentUpon>ActionElement.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.Targets" />
 </Project>

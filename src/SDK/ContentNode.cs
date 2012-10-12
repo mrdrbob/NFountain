@@ -81,7 +81,7 @@ namespace PageOfBob.NFountain
 		
 		// Linearizes the tree structure of a content node into single words with
 		// font style attached, making it easier to output.
-		public IEnumerable<Tuple<FontStyle, string>> Linearize() {
+		public IEnumerable<WordAndFont> Linearize() {
 			Stack<LinearizerState> stack = new Stack<ContentNode.LinearizerState>();
 			
 			LinearizerState current = new ContentNode.LinearizerState(null, this, 0, FontStyle.Plain);
@@ -104,7 +104,7 @@ namespace PageOfBob.NFountain
 						string trimmed = t.Trim();
 						if (trimmed.Length == 0)
 							continue;
-						yield return new Tuple<FontStyle, string>(style, trimmed);
+						yield return new WordAndFont(style, trimmed);
 					}
 				}
 				

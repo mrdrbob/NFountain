@@ -138,11 +138,21 @@ namespace PageOfBob.NFountain.Plugins
 			if (action == null)
 				return false;
 			
+			/*
 			string[] lines = BreakIntoLines(action.Content.ToString(), _settings.WritablePageWidth());
 			if (!HaveRoomFor(lines.Length))
 				NewPage();
+			*/
 			
-			WriteContentNode(action.Content, PageSettings.InPoints(_settings.WritablePageWidth()), (x) => 0);
+			
+			WriteContentNode(action.Content, PageSettings.InPoints(_settings.WritablePageWidth()), x => 0, l => {
+				if(l > 0) {
+					MoveDown(1);
+					WriteRightAlignedLine("(CONTINUED)");
+				}
+				NewPage();
+			});
+			
 			/*
 			foreach (string line in lines) {
 				WriteLine(line);
@@ -173,9 +183,9 @@ namespace PageOfBob.NFountain.Plugins
 			string[] parenthetical = string.IsNullOrEmpty(dialog.Parenthetical) ? new string[0] : BreakIntoLines(dialog.Parenthetical, _settings.ParentheticalWidth);
 			string[] dialogtext = BreakIntoLines(dialog.Dialog.ToString(), _settings.DialogWidth);
 			
-			int totalLines = charLine.Length + parenthetical.Length + dialogtext.Length;
+			int totalLines = charLine.Length + parenthetical.Length + 3;
 			
-			if (!HaveRoomFor(totalLines)) {
+			if (!HaveRoomFor(totalLines) && dialogtext.Length <= 2) {
 				NewPage();
 			}
 			
@@ -196,7 +206,20 @@ namespace PageOfBob.NFountain.Plugins
 				IndentInches(-_settings.CharacterIndent);
 			}
 			
-			WriteContentNode(dialog.Dialog, PageSettings.InPoints(_settings.DialogWidth), (x) => PageSettings.InPoints(_settings.DialogIndent) );
+			WriteContentNode(dialog.Dialog, PageSettings.InPoints(_settings.DialogWidth), (x) => PageSettings.InPoints(_settings.DialogIndent), l => {
+             	if (l > 0) {
+             		MoveDown(1);
+             		WriteRightAlignedLine("(CONTINUED)");
+             		NewPage();
+             		IndentInches(_settings.CharacterIndent);
+					foreach (string line in charLine) {
+						WriteLine(line);
+					}
+             		IndentInches(-_settings.CharacterIndent + _settings.ParentheticalIndent);
+             		WriteLine("(CONT'D)");
+             		IndentInches(-_settings.ParentheticalIndent);
+             	}
+			});
 			
 			/*
 			foreach (string line in dialogtext) {
@@ -237,7 +260,7 @@ namespace PageOfBob.NFountain.Plugins
 			if (!HaveRoomFor(lines.Length))
 				NewPage();
 			
-			WriteContentNode(centered.Content, widthInPoints, (x) =>  (widthInPoints - x) / 2 );
+			WriteContentNode(centered.Content, widthInPoints, (x) =>  (widthInPoints - x) / 2, null );
 			
 			EmptyLine();
 			
@@ -371,15 +394,95 @@ namespace PageOfBob.NFountain.Plugins
 			_page.NextLine(-leftIndent, 0);
 		}
 		
+		public class WordAndFontLine {
+			public WordAndFont[] Line { get; private set; }
+			public float Indent { get; private set; }
+			
+			public WordAndFontLine(WordAndFont[] line, float indent) {
+				Line = line;
+				Indent = indent;
+			}
+		}
+		
+		private IEnumerable<WordAndFontLine> ContentNodeToLines(ContentNode node, float widthToFill, Func<float, float> calculateIndent) {
+			List<WordAndFont> buffer = new List<WordAndFont>();
+			float currentLength = 0;
+			var liner = node.Linearize().GetEnumerator();
+			
+			do {
+				bool hasMore = liner.MoveNext();
+				float toAdd = hasMore ? liner.Current.Word.Length * _settings.EffectiveCharWidth : 0;
+				bool isTooLong = hasMore && (currentLength + toAdd > widthToFill);
+				
+				if (!hasMore || isTooLong) {
+					// Dump the buffer.
+					float indent = calculateIndent(currentLength);
+					yield return new WordAndFontLine(buffer.ToArray(), indent);
+					buffer.Clear();
+					currentLength = 0;
+				}
+				
+				if (!hasMore)
+					break;
+				
+				buffer.Add(liner.Current);
+				currentLength += toAdd + _settings.EffectiveCharWidth;
+			} while(true);
+		}
+		
+		private void WriteContentNode(ContentNode node, float widthToFill, 
+		                              Func<float, float> calculateIndent,
+		                             Action<int> notEnoughRoom) {
+			var lines = ContentNodeToLines(node, widthToFill, calculateIndent).ToArray();
+			int linesWritten = 0;
+			
+			for(int x=0; x<lines.Length; x++) {
+				if (!HaveRoomFor(2) && lines.Length > 2) {
+					if (notEnoughRoom == null)
+						NewPage();
+					else
+						notEnoughRoom(linesWritten);
+				}
+				
+				WriteContentLine(lines[x]);
+				MoveDown(1);
+				linesWritten += 1;
+			}
+			MoveDown(1);
+		}
+		
+		private void WriteContentLine(WordAndFontLine line) {
+			FontStyle currentFont = FontStyle.Plain;
+			
+			_page.NextLine(line.Indent, 0);
+			foreach(var i in line.Line) {
+				if (i.Style != currentFont) {
+					switch (i.Style) {
+						case FontStyle.Bold: _page.SetFont(_courierBold, _settings.FontSize); break;
+						case FontStyle.Italic: _page.SetFont(_courierItalic, _settings.FontSize); break;
+						case FontStyle.BoldItalic: _page.SetFont(_courierBoldItalic, _settings.FontSize); break;
+						case FontStyle.Plain: _page.SetFont(_courier, _settings.FontSize); break;
+					}
+					currentFont = i.Style;
+				}
+				_page.WriteText(i.Word + " ");
+			}
+			_page.NextLine(-line.Indent, 0);
+			
+			if (currentFont != FontStyle.Plain)
+				_page.SetFont(_courier, _settings.FontSize);
+		}
+		
+		/*
 		private void WriteContentNode(ContentNode node, float widthToFill, Func<float, float> calculateIndent) {
-			List<Tuple<FontStyle, string>> buffer = new List<Tuple<FontStyle, string>>();
+			List<WordAndFont> buffer = new List<WordAndFont>();
 			float currentLength = 0;
 			var liner = node.Linearize().GetEnumerator();
 			FontStyle currentFont = FontStyle.Plain;
 			
 			do {
 				bool hasMore = liner.MoveNext();
-				float toAdd = hasMore ? liner.Current.Item2.Length * _settings.EffectiveCharWidth : 0;
+				float toAdd = hasMore ? liner.Current.Word.Length * _settings.EffectiveCharWidth : 0;
 				bool isTooLong = hasMore && (currentLength + toAdd > widthToFill);
 				
 				if (!hasMore || isTooLong) {
@@ -387,16 +490,16 @@ namespace PageOfBob.NFountain.Plugins
 					float indent = calculateIndent(currentLength);
 					_page.NextLine(indent, 0);
 					foreach(var i in buffer) {
-						if (i.Item1 != currentFont) {
-							switch (i.Item1) {
+						if (i.Style != currentFont) {
+							switch (i.Style) {
 								case FontStyle.Bold: _page.SetFont(_courierBold, _settings.FontSize); break;
 								case FontStyle.Italic: _page.SetFont(_courierItalic, _settings.FontSize); break;
 								case FontStyle.BoldItalic: _page.SetFont(_courierBoldItalic, _settings.FontSize); break;
 								case FontStyle.Plain: _page.SetFont(_courier, _settings.FontSize); break;
 							}
-							currentFont = i.Item1;
+							currentFont = i.Style;
 						}
-						_page.WriteText(i.Item2 + " ");
+						_page.WriteText(i.Word + " ");
 					}
 					_page.NextLine(-indent, 0);
 					
@@ -417,6 +520,7 @@ namespace PageOfBob.NFountain.Plugins
 			if (currentFont != FontStyle.Plain)
 				_page.SetFont(_courier, _settings.FontSize);
 		}
+		*/
 		
 		private void MoveDown(int lines) {
 			float distance = (float)-lines * _settings.EffectiveCharHeight;
